@@ -1,6 +1,5 @@
 import time
 
-from numpy.ma.core import append
 from numpy.testing import assert_equal
 
 
