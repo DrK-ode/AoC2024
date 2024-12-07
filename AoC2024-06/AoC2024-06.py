@@ -118,9 +118,10 @@ class Crawler:
         self._position = numpy.array([x, y])
 
 
-def guard_itinerary(patrol_map: Matrix, starting_position: (int, int)) -> [] or list[(int, int), (int, int)]:
+def guard_itinerary(patrol_map: Matrix, starting_position: (int, int), starting_direction) -> [] or list[
+    (int, int), (int, int)]:
     itinerary: [] or list[((int, int), (int, int))] = []
-    guard = Crawler(patrol_map, patrol_map.direction_by_name('Up'), starting_position)
+    guard = Crawler(patrol_map, starting_direction, starting_position)
     while guard.mark_step(itinerary):
         pass
     return itinerary
@@ -129,20 +130,24 @@ def guard_itinerary(patrol_map: Matrix, starting_position: (int, int)) -> [] or 
 def solve_part1and2(input_file: str) -> (int, int):
     patrol_map = Matrix(read_input(input_file))
     starting_position = patrol_map.find('^')
-    guard_path = guard_itinerary(patrol_map, starting_position)
+    original_path = guard_itinerary(patrol_map, starting_position, patrol_map.direction_by_name('Up'))
     candidate_obstacles = set()
-    for position, direction in guard_path:
+    for position, direction in original_path:
         candidate_obstacles.add((position[0], position[1]))
     candidate_obstacles.remove((starting_position[0], starting_position[1]))
     loop_obstacles = []
-    for obstacle in candidate_obstacles:
-        patrol_map[obstacle] = '#'
-        guard_path = guard_itinerary(patrol_map, starting_position)
-        last_destination_x = guard_path[-1][0][0] + guard_path[-1][1][0]
-        last_destination_y = guard_path[-1][0][1] + guard_path[-1][1][1]
+    tried = set()
+    for index, obstacle in list(enumerate(original_path))[1:]:
+        if obstacle[0] in tried:
+            continue
+        patrol_map[obstacle[0]] = '#'
+        new_path = guard_itinerary(patrol_map, original_path[index - 1][0], original_path[index - 1][1])
+        last_destination_x = new_path[-1][0][0] + new_path[-1][1][0]
+        last_destination_y = new_path[-1][0][1] + new_path[-1][1][1]
         if patrol_map.is_in_bound((last_destination_x, last_destination_y)):
             loop_obstacles.append(obstacle)
-        patrol_map[obstacle] = '.'
+        patrol_map[obstacle[0]] = '.'
+        tried.add(obstacle[0])
 
     return len(candidate_obstacles) + 1, len(loop_obstacles)
 
