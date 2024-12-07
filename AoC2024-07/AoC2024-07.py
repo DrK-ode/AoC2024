@@ -1,6 +1,5 @@
 import time
 
-import numpy
 from numpy.testing import assert_equal
 
 
@@ -18,11 +17,11 @@ def solve_part1(input_file: str) -> int:
     equations = read_input(input_file)
     result_sum = 0
     for result, numbers in equations:
-        possibilities = numpy.array([numbers[0]])
+        possibilities = [numbers[0]]
         for number in numbers[1:]:
-            additions = possibilities + number
-            multiplications = possibilities * number
-            possibilities = numpy.concatenate([additions, multiplications])
+            possibilities = [item for possibility in possibilities for item in
+                             [number + possibility, number * possibility] if
+                             item <= result]
         result_sum += result if result in possibilities else 0
     return result_sum
 
@@ -35,12 +34,11 @@ def solve_part2(input_file: str) -> int:
     equations = read_input(input_file)
     result_sum = 0
     for result, numbers in equations:
-        possibilities = numpy.array([numbers[0]])
+        possibilities = [numbers[0]]
         for number in numbers[1:]:
-            additions = possibilities + number
-            multiplications = possibilities * number
-            concatenations = [concat(possibility, number) for possibility in possibilities]
-            possibilities = numpy.concatenate([additions, multiplications, concatenations])
+            possibilities = [item for possibility in possibilities for item in
+                             [number + possibility, number * possibility, concat(possibility, number)] if
+                             item <= result]
         result_sum += result if result in possibilities else 0
     return result_sum
 
