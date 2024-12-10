@@ -81,50 +81,7 @@ class Matrix:
         return self._the_matrix_as_list.count(item)
 
 
-class Crawler:
-    def __init__(self, matrix: Matrix, direction: (int, int), position: (int, int)):
-        self._direction = numpy.array([direction[0], direction[1]])
-        self._position = numpy.array([position[0], position[1]])
-        self._matrix = matrix
-
-    def __str__(self):
-        return f'Crawler@({self._position})={self.at()}'
-
-    def position(self) -> (int, int):
-        return self._position[0], self._position[1]
-
-    def mark_step(self, itinerary: [] or list[((int, int), (int, int))]) -> bool:
-        item = ((self._position[0], self._position[1]), (self._direction[0], self._direction[1]))
-        if item in itinerary:
-            return False
-        itinerary.append(item)
-        at_next_position = self.next()
-        if at_next_position is None:
-            return False
-        elif at_next_position == '#':
-            self.turn()
-        else:
-            self._position += self._direction
-        return True
-
-    def turn(self):
-        self._direction = self._direction.dot(numpy.array([[0, 1], [-1, 0]]))
-
-    def next(self):
-        next_position = self._position + self._direction
-        if self._matrix.is_in_bound(next_position):
-            return self._matrix[*next_position]
-        else:
-            return None
-
-    def at(self):
-        return self._matrix[self._position[0], self._position[1]]
-
-    def set(self, x: int, y: int):
-        self._position = numpy.array([x, y])
-
-
-def solve_part1(input_file: str) -> (int, int):
+def solve_part1(input_file: str) -> int:
     topo = Matrix(read_input(input_file), '!')
     trail = topo.find_all(0)
     score = 0
@@ -142,7 +99,7 @@ def solve_part1(input_file: str) -> (int, int):
     return score
 
 
-def solve_part2(input_file: str) -> (int, int):
+def solve_part2(input_file: str) -> int:
     topo = Matrix(read_input(input_file), '!')
     trail = topo.find_all(0)
     score = 0
