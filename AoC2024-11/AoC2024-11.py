@@ -36,14 +36,9 @@ def blink(blinks: int, stone: int) -> int:
 
 def count_stones(blinks: int, stones: list[int]) -> int:
     stone_dict = {}
-    for stone in stones:
-        if stone in stone_dict:
-            stone_dict[stone] += 1
-        else:
-            stone_dict[stone] = 1
     counter = 0
-    for stone, amount in stone_dict.items():
-        counter += amount * blink(blinks, stone)
+    for stone in stones:
+        counter += blink(blinks, stone)
     return counter
 
 
