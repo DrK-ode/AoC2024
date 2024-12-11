@@ -2,7 +2,6 @@ import math
 import time
 from functools import cache
 
-import numpy
 from numpy.testing import assert_equal
 
 
@@ -68,11 +67,12 @@ def solve_part(part: int) -> int:
     return answer
 
 
-correct_answers = {1: 212655, 2: -1}
+correct_answers = {1: 212655, 2: 253582809724830}
 
+# Since return values are cached the timing will be off if the tests are run first
 # assert_equal(solve_part1('test1.txt'), 55312, 'Incorrect answer to example.')
 # assert_equal(solve_part1('input.txt'), correct_answers[1], f'Incorrect answer to part 1')
 # assert_equal(solve_part2('input.txt'), correct_answers[2], f'Incorrect answer to part 2')
 
-for p in [1, 2]:
-    solve_part(p)
+solve_part(1)
+solve_part(2)
