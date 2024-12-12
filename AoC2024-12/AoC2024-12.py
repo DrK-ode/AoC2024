@@ -1,7 +1,6 @@
 import time
 
 from numpy.testing import assert_equal
-from samba.netcmd.user import cmd_user_rename
 
 
 def read_input(input_file: str) -> list[list[(str, bool)]]:
