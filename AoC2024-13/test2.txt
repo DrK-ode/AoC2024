@@ -1,0 +1,7 @@
+Button A: X+4, Y+4
+Button B: X+1, Y+1
+Prize: X=4, Y=4
+
+Button A: X+1, Y+1
+Button B: X+1, Y+1
+Prize: X=4, Y=4
