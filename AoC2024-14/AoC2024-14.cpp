@@ -45,7 +45,7 @@ vector<Robot> read_input(const std::string &file_name)
 
 int better_mod(int n, int m)
 {
-    return ((n % m) + m) % m;
+    return n < 0 ? n - m * (n / m - 1) : n % m;
 }
 
 vector<Vec2> calc_positions(const vector<Robot> &robots, int t)
