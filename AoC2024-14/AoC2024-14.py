@@ -73,7 +73,7 @@ def calc_scores(positions: list[(int, int)]) -> (int, int):
 def find_offsets(robots: list[(int, int, int, int)]) -> (int, int):
     h_best_score = (0, None)
     v_best_score = (0, None)
-    for t in range(0, 101):
+    for t in range(0, 103):
         positions = calc_positions(robots, t)
         h_score, v_score = calc_scores(positions)
         if h_score > h_best_score[0]:
