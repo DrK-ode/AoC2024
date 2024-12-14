@@ -52,26 +52,22 @@ def inspect_positions(robots: list[(int, int, int, int)], period: int, offset: i
         t += period
 
 
-def calc_positions(robots: list[(int, int, int, int)], t: int) -> list[list[int]]:
+def calc_positions(robots: list[(int, int, int, int)], t: int) -> list[(int, int)]:
     height = 103
     width = 101
-    positions = [[0] * width for _ in range(0, height)]
+    positions = []
     for rv in robots:
-        positions[(rv[1] + rv[3] * t) % height][(rv[0] + rv[2] * t) % width] += 1
+        positions.append(((rv[0] + rv[2] * t) % width, (rv[1] + rv[3] * t) % height))
     return positions
 
 
-def calc_scores(positions):
-    horizontal_score = 0
-    vertical_score = 0
-    for line in positions:
-        horizontal_score = max(horizontal_score, sum(line))
-    for column in range(0, 101):
-        col_sum = 0
-        for line in positions:
-            col_sum += line[column]
-        vertical_score = max(vertical_score, col_sum)
-    return horizontal_score, vertical_score
+def calc_scores(positions: list[(int, int)]) -> (int, int):
+    v_scores = [0] * 101
+    h_scores = [0] * 103
+    for pos in positions:
+        v_scores[pos[0]] += 1
+        h_scores[pos[1]] += 1
+    return max(h_scores), max(v_scores)
 
 
 def find_offsets(robots: list[(int, int, int, int)]) -> (int, int):
@@ -88,8 +84,11 @@ def find_offsets(robots: list[(int, int, int, int)]) -> (int, int):
 
 
 def print_positions(positions):
-    for line in positions:
-        print(''.join(map(lambda x: ' ' if x == 0 else '#', line)))
+    robot_map = [[' '] * 101 for _ in range(0, 103)]
+    for pos in positions:
+        robot_map[pos[1]][pos[0]] = '#'
+    for line in robot_map:
+        print(''.join(line))
 
 
 def solve_part1(input_file: str, width=101, height=103) -> int:
@@ -101,34 +100,35 @@ def solve_part2(input_file: str, manually=False) -> int:
     robots = read_input(input_file)
     if manually:
         return inspect_positions(robots, 103, 0)
-    # The data has a period of 101 in x and 103 in y, respectively
-    # The data shows clusters at t = 48 + nx*101 and t = 1 + ny*103
-    # We seek the solution to the equation 101*nx - 103*ny = -47
-    # 101 and 103 are both prime so the GCD is 1
+    # The data has a period of 101 in x and 103 in y, respectively.
+    # The data shows clusters at
+    delta_x, delta_y = find_offsets(robots)
+    # We seek the solution to the equations
+    #   t = delta_x + nx*101
+    #   t = delta_y + ny*103.
+    # i.e.
+    #   101*nx - 103*ny = delta_y - delta_x = delta_n.
+    delta_n = delta_y - delta_x
+    # Since 101 and 103 are both prime the GCD is 1.
     # Euclides algorithm:
     #   101 = 1*103 - 2
     #   103 = 51*2 + 1
     #   101 - 1*103 = 2
     #   103 - 51*2 = 1
     # i.e.
-    #   1 = 103 - 51*2 = 103 - 51 * (103 - 101) = 101*51 - 103*50
-    # Multiply by -47
-    #   -47 = 101*(-47)*51 - 103*(-47)*50
-    # One solution is:
-    #   nx_0 = -2397
-    #   ny_0 = -2350
+    #   1 = 103 - 51*2 = 103 - 51 * (103 - 101) = 101*51 - 103*50.
+    # Multiply by delta_n
+    #   delta_n = 101*delta_n*51 - 103*delta_n*50
+    # One solution is trivially:
+    #   nx_0 = 51*delta_n
+    #   ny_0 = 50*delta_n
+    nx = delta_n * 51
     # All solutions are given by
     #   nx = nx_0 + 103*k
     #   ny = ny_0 + 101*k
-    # Smallest non-negative nx is 75 so the smallest t is 48 + 75*101 = 7623
-    x_offset, y_offset = find_offsets(robots)
-    x_period = 101
-    y_period = 103
-    offset_diff = y_offset - x_offset
-    nx_0 = offset_diff * 51
-    k = -nx_0 // y_period + 1
-    nx = nx_0 + y_period * k
-    t = x_offset + nx * x_period
+    # Smallest non-negative nx is yields the smallest t = delta_x + nx * 101
+    nx -= 103 * (nx // 103)
+    t = delta_x + nx * 101
     # print_positions(calc_positions(robots, t))
     return t
 
