@@ -58,7 +58,23 @@ def solve_part1(input_file: str, width=101, height=103) -> int:
 def solve_part2(input_file: str) -> int:
     robots = read_input(input_file)
     # The data has a period of 101 in x and 103 in y, respectively
-    # The data shows clusters at t = 48 + n*101 and t = 1 + n*103
+    # The data shows clusters at t = 48 + nx*101 and t = 1 + ny*103
+    # We seek the solution to the equation 101*nx - 103*ny = -47
+    # 101 and 103 are both prime so the GCD is 1
+    # Euclides algorithm:
+    #   101 = 1*103 - 2
+    #   103 = 51*2 + 1
+    # i.e.
+    #   1 = 103 - 51*2 = 103 - 51 * (103 - 101) = 101*51 - 103*50
+    # Multiply by -47
+    #   -47 = -47*101*51 + 47*103*50
+    # One solution is:
+    #   nx_0 = -2397
+    #   ny_0 =  2350
+    # All solutions are given by
+    #   nx = nx_0 + 103*k
+    #   ny = ny_0 - 101*k
+    # Smallest non-negative nx is 75 so the smallest t is 48 + 75*101 = 7623
     return inspect_positions(robots, 103, 7623, 101, 103)
 
 
