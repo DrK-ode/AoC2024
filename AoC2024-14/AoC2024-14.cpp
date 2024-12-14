@@ -5,6 +5,7 @@
 #include <ranges>
 #include <algorithm>
 #include <chrono>
+#include <sstream>
 
 using namespace std;
 
@@ -27,10 +28,12 @@ vector<Robot> read_input(const std::string &file_name)
 {
     vector<Robot> robots;
     ifstream input_file(file_name);
+    stringstream ss;
+    ss << input_file.rdbuf();
     string str;
     match_results<std::string::const_iterator> match;
     basic_regex regex(R"(p=(-?\d+),(-?\d+) v=(-?\d+),(-?\d+))");
-    while (getline(input_file, str))
+    while (getline(ss, str))
     {
         regex_match(str, match, regex);
         auto vec = match | ranges::views::drop(1) | ranges::views::transform([](auto &m)
@@ -96,8 +99,9 @@ int main(int argc, char **argv)
         cerr << "ERROR: Takes one and only one argument." << endl;
         return -1;
     }
-    auto robots = read_input(argv[1]);
     auto timer_start = chrono::system_clock::now();
+    auto robots = read_input(argv[1]);
+    auto read_duration = chrono::system_clock::now() - timer_start;
     auto [delta_x, delta_y] = find_offsets(robots);
     int delta_n = delta_y - delta_x;
     int nx = delta_n * 51;
@@ -108,7 +112,7 @@ int main(int argc, char **argv)
     }
     nx -= HEIGHT * factor;
     int t = delta_x + nx * WIDTH;
-    auto duration = chrono::system_clock::now() - timer_start;
-    cout << "Found t=" << t << " in " << duration << endl;
+    auto duration = chrono::system_clock::now() - timer_start - read_duration;
+    cout << "Found t=" << t << " in " << duration << " (Reading the input file took " << read_duration << ")" << endl;
     return 0;
 }
