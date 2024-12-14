@@ -99,9 +99,9 @@ int main(int argc, char **argv)
         cerr << "ERROR: Takes one and only one argument." << endl;
         return -1;
     }
-    auto timer_start = chrono::system_clock::now();
+    auto timer_start = chrono::high_resolution_clock::now();
     auto robots = read_input(argv[1]);
-    auto read_duration = chrono::system_clock::now() - timer_start;
+    auto read_duration = chrono::high_resolution_clock::now() - timer_start;
     auto [delta_x, delta_y] = find_offsets(robots);
     int delta_n = delta_y - delta_x;
     int nx = delta_n * 51;
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     }
     nx -= HEIGHT * factor;
     int t = delta_x + nx * WIDTH;
-    auto duration = chrono::system_clock::now() - timer_start - read_duration;
-    cout << "Found t=" << t << " in " << duration << " (Reading the input file took " << read_duration << ")" << endl;
+    auto duration = chrono::high_resolution_clock::now() - timer_start - read_duration;
+    cout << "Found t=" << t << " in " << duration_cast<chrono::microseconds>(duration) << " (Reading the input file took " << duration_cast<chrono::microseconds>(read_duration) << ")" << endl;
     return 0;
 }
