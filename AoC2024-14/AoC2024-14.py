@@ -91,6 +91,12 @@ def print_positions(positions):
         print(''.join(line))
 
 
+def print_tree_from_file(file_name: str, generation: int):
+    robots = read_input(file_name)
+    print_positions(calc_positions(robots, generation))
+    return
+
+
 def solve_part1(input_file: str, width=101, height=103) -> int:
     robots = read_input(input_file)
     return predict_positions(robots, 100, width, height)
@@ -149,6 +155,9 @@ assert_equal(solve_part1('test1.txt', 11, 7), 12, 'Incorrect answer to example.'
 assert_equal(solve_part1('input.txt'), correct_answers[1], f'Incorrect answer to part 1')
 assert_equal(solve_part2('input.txt'), correct_answers[2], f'Incorrect answer to part 2')
 assert_equal(solve_part2('other_input.txt'), 2241, f'Incorrect answer to part 2')
+assert_equal(solve_part2('another_input.txt'), 42, f'Incorrect answer to part 2')
 
 for p in [1, 2]:
     solve_part(p)
+
+print_tree_from_file('input.txt', correct_answers[2])
