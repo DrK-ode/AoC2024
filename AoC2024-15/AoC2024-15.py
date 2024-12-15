@@ -1,7 +1,6 @@
 import time
 
 import numpy
-from PIL.ImageChops import offset
 from numpy.testing import assert_equal
 
 
