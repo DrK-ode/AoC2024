@@ -121,27 +121,27 @@ class Raindeer:
 def descend_score(start_position: (int, int), scores: dict[((int, int), (int, int)), int]) -> int:
     raindeers = []
     for direction in Grid.EAST, Grid.WEST, Grid.NORTH, Grid.SOUTH:
-        r = Raindeer(start_position, direction)
-        if r.state() in scores:
-            r.score = scores[r.state()]
-            raindeers.append(r)
+        split_raindeer = Raindeer(start_position, direction)
+        if split_raindeer.state() in scores:
+            split_raindeer.score = scores[split_raindeer.state()]
+            raindeers.append(split_raindeer)
     tiles = set()
     tiles.add(raindeers[0].pos)
     while raindeers:
         raindeer = raindeers.pop()
+        raindeer.go_prev()
         split = [raindeer, copy(raindeer), copy(raindeer), copy(raindeer)]
         split[1].turn_back_left()
         split[2].turn_back_right()
         split[3].turn_back_left()
         split[3].turn_back_left()
-        for r in split:
-            r.go_prev()
-            score = scores.get(r.state(), None)
-            if score is None or score > r.score:
+        for split_raindeer in split:
+            score = scores.get(split_raindeer.state(), None)
+            if score is None or score > split_raindeer.score:
                 continue
-            tiles.add(r.pos)
-            if r.score > 0:
-                raindeers.append(r)
+            tiles.add(split_raindeer.pos)
+            if split_raindeer.score > 0:
+                raindeers.append(split_raindeer)
     return len(tiles)
 
 
@@ -152,27 +152,25 @@ def solve_maze(maze: Grid) -> (int, dict[Raindeer, int]):
     candidate_raindeers: SortedList[Raindeer] = SortedList(key=lambda state: -state.score)
     candidate_raindeers.add(raindeer)
     while candidate_raindeers:
-        next_states = []
-        raindeer_forward = candidate_raindeers.pop()
-        raindeer_left = copy(raindeer_forward)
-        raindeer_left.turn_left()
-        next_states.append(raindeer_left)
-        raindeer_right = copy(raindeer_forward)
-        raindeer_right.turn_right()
-        next_states.append(raindeer_right)
-        raindeer_forward.go_next()
-        at_pos = maze[raindeer_forward.pos]
-        if at_pos != '#':
-            next_states.append(raindeer_forward)
+        raindeer = candidate_raindeers.pop()
+        split_raindeers = [raindeer, copy(raindeer), copy(raindeer), copy(raindeer)]
+        split_raindeers[1].turn_left()
+        split_raindeers[2].turn_right()
+        split_raindeers[3].turn_left()
+        split_raindeers[3].turn_left()
 
-        for raindeer in next_states:
-            prev_score = visited_states.get(raindeer.state(), None)
-            if prev_score is None or raindeer.score < prev_score:
-                visited_states[raindeer.state()] = raindeer.score
-                if maze[raindeer.pos] != 'E':
-                    candidate_raindeers.add(raindeer)
+        for split_raindeer in split_raindeers:
+            split_raindeer.go_next()
+            at_pos = maze[split_raindeer.pos]
+            if at_pos == '#':
+                continue
+            prev_score = visited_states.get(split_raindeer.state(), None)
+            if prev_score is None or split_raindeer.score < prev_score:
+                visited_states[split_raindeer.state()] = split_raindeer.score
+                if at_pos != 'E':
+                    candidate_raindeers.add(split_raindeer)
                 else:
-                    winners.append(raindeer)
+                    winners.append(split_raindeer)
         if len(winners) > 0:
             # Remove all paths that does not have a lower score
             purge_index = candidate_raindeers.bisect_right(winners[0])
