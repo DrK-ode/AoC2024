@@ -49,15 +49,15 @@ ulong predict_secrets(const vector<ulong> &seller_secrets)
     return secret_sum;
 }
 
-bool unreasonable_sequence(const vector<int_fast8_t> &seq)
+bool unreasonable_sequence(const int_fast8_t *seq)
 {
-    return abs(accumulate(seq.cbegin(), seq.cend(), 0)) > 9;
+    return abs(seq[0] + seq[1] + seq[2] + seq[3]) > 9;
 }
 
-ulong sell_to_single_buyer_with_sequence(ulong secret, const vector<int_fast8_t> &seq)
+ulong sell_to_single_buyer_with_sequence(ulong secret, const int_fast8_t *seq)
 {
     int_fast8_t last_price = secret % 10;
-    vector<int_fast8_t> last_seq = {-100, -100, -100, -100};
+    int_fast8_t last_seq[4] = {-100, -100, -100, -100};
     ulong n = 0;
     while (n++ < 2000)
     {
@@ -68,7 +68,7 @@ ulong sell_to_single_buyer_with_sequence(ulong secret, const vector<int_fast8_t>
         last_seq[2] = last_seq[3];
         last_seq[3] = price - last_price;
         last_price = price;
-        if (seq == last_seq)
+        if (seq[0] == last_seq[0] && seq[1] == last_seq[1] && seq[2] == last_seq[2] && seq[3] == last_seq[3])
         {
             return price;
         }
@@ -80,15 +80,15 @@ ulong sell_for_bananas(const vector<ulong> &secrets)
 {
     ulong record_bananas = 0;
     vector<int_fast8_t> record_seq(4);
-    for (int_fast8_t a = -9; a < 10; ++a)
+    int_fast8_t seq[4] = {0, 0, 0, 0};
+    for (seq[0] = -9; seq[0] < 10; ++seq[0])
     {
-        for (int_fast8_t b = -9; b < 10; ++b)
+        for (seq[1] = -9; seq[1] < 10; ++seq[1])
         {
-            for (int_fast8_t c = -9; c < 10; ++c)
+            for (seq[2] = -9; seq[2] < 10; ++seq[2])
             {
-                for (int_fast8_t d = -9; d < 10; ++d)
+                for (seq[3] = -9; seq[3] < 10; ++seq[3])
                 {
-                    const vector<int_fast8_t> seq = {a, b, c, d};
                     if (unreasonable_sequence(seq))
                     {
                         continue;
@@ -101,7 +101,10 @@ ulong sell_for_bananas(const vector<ulong> &secrets)
                     if (bananas > record_bananas)
                     {
                         record_bananas = bananas;
-                        record_seq.assign(seq.cbegin(), seq.cend());
+                        record_seq[0] = seq[0];
+                        record_seq[1] = seq[1];
+                        record_seq[2] = seq[2];
+                        record_seq[3] = seq[3];
                     }
                 }
             }
