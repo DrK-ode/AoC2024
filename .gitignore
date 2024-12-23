@@ -173,3 +173,7 @@ cython_debug/
 .vscode/
 
 input.txt
+
+# Ignore files from profiling
+*.profraw
+*.profdata
